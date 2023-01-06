@@ -1,5 +1,8 @@
 package com.task.taskmanagerappbe.tasks;
 
+import com.task.taskmanagerappbe.tasks.dtos.CreateTaskDto;
+import com.task.taskmanagerappbe.tasks.dtos.TaskResponseDto;
+import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
@@ -7,17 +10,17 @@ import java.util.Date;
 @Service
 public class TasksService {
     private final TasksRepository tasksRepository;
+    private final ModelMapper modelMapper;
 
-    public TasksService(TasksRepository tasksRepository) {
+    public TasksService(TasksRepository tasksRepository, ModelMapper modelMapper) {
         this.tasksRepository = tasksRepository;
+        this.modelMapper=modelMapper;
     }
 
-    public TasksEntity createTask(String title, String description, Date dueDate){
-        TasksEntity task=new TasksEntity();
-        task.setTitle(title);
-        task.setDescription(description);
+    public TaskResponseDto createTask(CreateTaskDto newTask){
+        TasksEntity task=modelMapper.map(newTask, TasksEntity.class);
         task.setCompleted(false);
-        task.setDueDate(dueDate);
-        return tasksRepository.save(task);
+        TasksEntity savedTask=tasksRepository.save(task);
+        return modelMapper.map(savedTask,TaskResponseDto.class);
     }
 }
